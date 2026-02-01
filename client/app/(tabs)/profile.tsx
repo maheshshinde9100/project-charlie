@@ -29,7 +29,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function ProfileScreen() {
     const router = useRouter();
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Box className="px-6 py-8 items-center">
                     <Avatar size="xl" className="mb-4 bg-indigo-100">
@@ -38,23 +38,26 @@ export default function ProfileScreen() {
                             source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }}
                         />
                     </Avatar>
-                    <Text className="text-2xl font-bold dark:text-white">Mahesh Shinde</Text>
-                    <Text className="text-gray-500 text-sm italic">Premium Wallet Member</Text>
+                    <Text className="text-2xl font-black dark:text-white">Mahesh Shinde</Text>
+                    <Box className="bg-brand-100 dark:bg-brand-900/30 px-3 py-1 rounded-full mt-1">
+                        <Text className="text-brand-700 dark:text-brand-300 text-[10px] font-bold uppercase tracking-widest">Premium Member</Text>
+                    </Box>
 
-                    <HStack className="mt-6 bg-indigo-600 rounded-2xl p-4 w-full shadow-lg" justifyContent="space-around">
+                    <HStack className="mt-8 bg-brand-600 dark:bg-brand-700 rounded-[32px] p-6 w-full shadow-2xl relative overflow-hidden" justifyContent="space-around">
+                        <Box className="absolute top-[-20] right-[-20] w-32 h-32 bg-white/5 rounded-full" />
                         <VStack alignItems="center">
-                            <Text className="text-white font-bold text-lg">152</Text>
-                            <Text className="text-indigo-200 text-[10px] uppercase">Payments</Text>
+                            <Text className="text-white font-black text-xl">152</Text>
+                            <Text className="text-brand-100 text-[9px] font-bold uppercase tracking-tighter">Payments</Text>
                         </VStack>
-                        <Divider orientation="vertical" className="bg-indigo-400 h-8" />
+                        <Divider orientation="vertical" className="bg-white/20 h-10" />
                         <VStack alignItems="center">
-                            <Text className="text-white font-bold text-lg">₹45k</Text>
-                            <Text className="text-indigo-200 text-[10px] uppercase">Spent</Text>
+                            <Text className="text-white font-black text-xl">₹45k</Text>
+                            <Text className="text-brand-100 text-[9px] font-bold uppercase tracking-tighter">Spent</Text>
                         </VStack>
-                        <Divider orientation="vertical" className="bg-indigo-400 h-8" />
+                        <Divider orientation="vertical" className="bg-white/20 h-10" />
                         <VStack alignItems="center">
-                            <Text className="text-white font-bold text-lg">12</Text>
-                            <Text className="text-indigo-200 text-[10px] uppercase">Pending</Text>
+                            <Text className="text-white font-black text-xl">12</Text>
+                            <Text className="text-brand-100 text-[9px] font-bold uppercase tracking-tighter">Pending</Text>
                         </VStack>
                     </HStack>
                 </Box>
@@ -110,10 +113,10 @@ function ProfileItem({ icon: IconComponent, label, onPress }: any) {
         <Pressable onPress={onPress}>
             <HStack justifyContent="space-between" alignItems="center" className="px-5 py-4">
                 <HStack space="md" alignItems="center">
-                    <Box className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-xl">
-                        <IconComponent size={20} color="#4f46e5" />
+                    <Box className="bg-brand-50 dark:bg-brand-900/20 p-2.5 rounded-2xl shadow-sm">
+                        <IconComponent size={20} color="#0ea5e9" />
                     </Box>
-                    <Text className="font-semibold dark:text-white">{label}</Text>
+                    <Text className="font-bold text-[15px] dark:text-slate-200">{label}</Text>
                 </HStack>
                 <ChevronRight size={18} color="#9ca3af" />
             </HStack>

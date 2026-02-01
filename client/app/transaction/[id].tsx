@@ -24,6 +24,7 @@ import {
 } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { AvatarImage } from '@gluestack-ui/config/build/theme/AvatarImage';
 
 export default function TransactionDetailsScreen() {
     const router = useRouter();
@@ -54,9 +55,9 @@ export default function TransactionDetailsScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50 dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <Box className="px-6 py-4 flex-row justify-between items-center">
-                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm">
+                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
                     <ArrowLeft size={20} color="#64748b" />
                 </Pressable>
                 <Text className="text-lg font-bold dark:text-white">Receipt</Text>
@@ -67,7 +68,7 @@ export default function TransactionDetailsScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} className="px-6">
                 {/* Receipt Concept Card */}
-                <Box className="bg-white dark:bg-slate-800 rounded-[32px] p-8 mt-4 shadow-sm border border-gray-100 dark:border-slate-700">
+                <Box className="bg-white dark:bg-slate-800 rounded-[32px] p-8 mt-4 shadow-sm border border-slate-100 dark:border-slate-700">
                     <VStack alignItems="center" space="md">
                         <Box className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
                             <CheckCircle2 size={40} color="#16a34a" />
@@ -80,7 +81,7 @@ export default function TransactionDetailsScreen() {
                         <Divider className="my-4 bg-gray-100 dark:bg-slate-700" />
 
                         <HStack space="md" alignItems="center" className="w-full">
-                            <Avatar size="md" className="bg-indigo-100">
+                            <Avatar size="md" className="bg-brand-100">
                                 <AvatarFallbackText>{tx.title}</AvatarFallbackText>
                                 <AvatarImage source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }} />
                             </Avatar>
@@ -110,7 +111,7 @@ export default function TransactionDetailsScreen() {
                 </Box>
 
                 <VStack space="md" className="mt-8 mb-10">
-                    <Button size="xl" className="bg-indigo-600 rounded-2xl h-16 shadow-lg shadow-indigo-100">
+                    <Button size="xl" className="bg-brand-600 rounded-2xl h-16 shadow-xl shadow-brand-200">
                         <Icon as={Download} size="md" className="mr-2" color="white" />
                         <ButtonText className="font-bold">Download PDF Receipt</ButtonText>
                     </Button>

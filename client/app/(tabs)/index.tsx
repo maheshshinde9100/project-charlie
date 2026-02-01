@@ -45,7 +45,7 @@ export default function DashboardScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-slate-900">
+    <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
       <ScrollView showsVerticalScrollIndicator={false}>
         <Box className="px-6 py-4">
           {/* Header */}
@@ -73,19 +73,24 @@ export default function DashboardScreen() {
 
           {/* Balance Card */}
           <Box
-            className="bg-indigo-600 rounded-3xl p-6 shadow-xl mb-6"
-            style={{ elevation: 8 }}
+            className="bg-brand-600 dark:bg-brand-700 rounded-[32px] p-7 shadow-2xl mb-8 overflow-hidden"
+            style={{ elevation: 12 }}
           >
-            <VStack space="md">
+            {/* Background pattern/decoration */}
+            <Box className="absolute top-[-40] right-[-40] w-40 h-40 bg-white/10 rounded-full" />
+            <Box className="absolute bottom-[-20] left-[-20] w-24 h-24 bg-brand-400/20 rounded-full" />
+            <VStack space="lg" className="relative z-10">
               <HStack justifyContent="space-between" alignItems="center">
-                <Text className="text-indigo-100 font-medium">Available Balance</Text>
-                <Wallet color="white" size={20} />
+                <Text className="text-brand-100 font-semibold tracking-wide uppercase text-[10px]">Total Balance</Text>
+                <Box className="bg-white/20 p-2 rounded-full">
+                  <Wallet color="white" size={16} />
+                </Box>
               </HStack>
-              <Text className="text-4xl font-bold text-white tracking-tight">{balance}</Text>
-              <HStack space="sm" className="bg-indigo-500/30 self-start px-3 py-1 rounded-full items-center">
-                <Clock color="white" size={14} />
-                <Text className="text-white text-xs font-semibold">
-                  Scheduled Settlements: {pendingSettlement}
+              <Text className="text-4xl font-extrabold text-white tracking-tight">{balance}</Text>
+              <HStack space="sm" className="bg-brand-500/40 self-start px-4 py-1.5 rounded-full items-center backdrop-blur-md">
+                <Clock color="#bae6fd" size={14} />
+                <Text className="text-brand-50 text-[11px] font-bold">
+                  Queued: {pendingSettlement}
                 </Text>
               </HStack>
             </VStack>
@@ -93,44 +98,27 @@ export default function DashboardScreen() {
 
           {/* Quick Actions */}
           <HStack space="md" className="mb-8">
-            <Button
-              className="flex-1 bg-white dark:bg-slate-800 rounded-2xl h-24 shadow-sm"
-              variant="link"
+            <ActionBtn
+              icon={ArrowUpRight}
+              label="Send"
+              color="#0ea5e9"
+              bgColor="bg-sky-50 dark:bg-sky-900/10"
               onPress={() => router.push('/send')}
-            >
-              <VStack alignItems="center" space="xs">
-                <Box className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-xl">
-                  <ArrowUpRight color="#2563eb" size={24} />
-                </Box>
-                <ButtonText className="text-gray-700 dark:text-gray-200 text-xs font-semibold">Send</ButtonText>
-              </VStack>
-            </Button>
-
-            <Button
-              className="flex-1 bg-white dark:bg-slate-800 rounded-2xl h-24 shadow-sm"
-              variant="link"
+            />
+            <ActionBtn
+              icon={Plus}
+              label="Top Up"
+              color="#10b981"
+              bgColor="bg-emerald-50 dark:bg-emerald-900/10"
               onPress={() => router.push('/topup')}
-            >
-              <VStack alignItems="center" space="xs">
-                <Box className="bg-green-100 dark:bg-green-900/30 p-2 rounded-xl">
-                  <Plus color="#16a34a" size={24} />
-                </Box>
-                <ButtonText className="text-gray-700 dark:text-gray-200 text-xs font-semibold">Top Up</ButtonText>
-              </VStack>
-            </Button>
-
-            <Button
-              className="flex-1 bg-white dark:bg-slate-800 rounded-2xl h-24 shadow-sm"
-              variant="link"
+            />
+            <ActionBtn
+              icon={Clock}
+              label="History"
+              color="#8b5cf6"
+              bgColor="bg-violet-50 dark:bg-violet-900/10"
               onPress={() => router.push('/history')}
-            >
-              <VStack alignItems="center" space="xs">
-                <Box className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-xl">
-                  <Clock color="#9333ea" size={24} />
-                </Box>
-                <ButtonText className="text-gray-700 dark:text-gray-200 text-xs font-semibold">History</ButtonText>
-              </VStack>
-            </Button>
+            />
           </HStack>
 
           {/* Pending Auto-Settle Section */}
@@ -216,5 +204,21 @@ export default function DashboardScreen() {
         </Box>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function ActionBtn({ icon: IconComp, label, color, bgColor, onPress }: any) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className={`flex-1 ${bgColor} rounded-3xl h-28 items-center justify-center shadow-sm border border-transparent active:border-brand-200`}
+    >
+      <VStack alignItems="center" space="xs">
+        <Box className="bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm">
+          <IconComp color={color} size={24} />
+        </Box>
+        <Text className="text-gray-700 dark:text-slate-300 text-xs font-bold mt-1">{label}</Text>
+      </VStack>
+    </Pressable>
   );
 }

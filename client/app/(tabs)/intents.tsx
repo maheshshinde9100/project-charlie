@@ -63,7 +63,7 @@ export default function IntentsScreen() {
     ];
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <Box className="px-6 py-4">
                 <Text className="text-2xl font-bold dark:text-white mb-2">Payment Intents</Text>
                 <Text className="text-gray-500 text-sm mb-6">Auto-trigger queue for insufficient balance payments.</Text>
@@ -78,7 +78,7 @@ export default function IntentsScreen() {
                                 pathname: "/intent/[id]",
                                 params: { id: intent.id }
                             })}
-                            className={`p-5 rounded-3xl border ${intent.status === 'Completed' ? 'border-gray-100 bg-gray-50/50 dark:bg-slate-800/30' : 'border-indigo-100 bg-indigo-50/30 dark:border-slate-700 dark:bg-slate-800'}`}
+                            className={`p-6 rounded-[32px] border ${intent.status === 'Completed' ? 'border-slate-100 bg-white dark:bg-slate-900/50 dark:border-slate-800' : 'border-amber-100 bg-amber-50/50 dark:border-amber-900/40 dark:bg-amber-950/20'} shadow-sm`}
                         >
                             <HStack justifyContent="space-between" alignItems="flex-start" className="mb-4">
                                 <VStack space="xs" className="flex-1">
@@ -101,8 +101,8 @@ export default function IntentsScreen() {
                                         ₹{intent.settledAmount} / ₹{intent.totalAmount}
                                     </Text>
                                 </HStack>
-                                <Progress value={(intent.settledAmount / intent.totalAmount) * 100} className="w-full h-2 bg-gray-200 dark:bg-slate-700">
-                                    <ProgressFilledTrack className="bg-indigo-600" />
+                                <Progress value={(intent.settledAmount / intent.totalAmount) * 100} className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full">
+                                    <ProgressFilledTrack className="bg-amber-500 rounded-full" />
                                 </Progress>
                             </VStack>
 
@@ -112,20 +112,21 @@ export default function IntentsScreen() {
                                     <Text className="text-xs text-gray-400">{intent.date}</Text>
                                 </HStack>
                                 <Button variant="link" size="sm" className="p-0">
-                                    <ButtonText className="text-indigo-600 text-sm font-semibold">Details</ButtonText>
-                                    <Icon as={ArrowRight} className="ml-1" size="sm" color="#4f46e5" />
+                                    <ButtonText className="text-brand-600 text-sm font-semibold">Details</ButtonText>
+                                    <Icon as={ArrowRight} className="ml-1" size="sm" color="#0ea5e9" />
                                 </Button>
                             </HStack>
                         </Pressable>
                     ))}
 
-                    {/* Info Card */}
-                    <Box className="bg-blue-50 dark:bg-slate-800 p-4 rounded-2xl flex-row space-x-3 items-start">
-                        <Info size={20} color="#3b82f6" style={{ marginTop: 2 }} />
+                    <Box className="bg-brand-600 dark:bg-brand-900/40 p-5 rounded-[32px] flex-row space-x-4 items-start shadow-xl shadow-brand-200">
+                        <Box className="bg-white/20 p-2 rounded-xl">
+                            <Info size={20} color="white" />
+                        </Box>
                         <VStack className="flex-1">
-                            <Text className="text-sm font-bold text-blue-900 dark:text-blue-300">How it works?</Text>
-                            <Text className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed mt-1">
-                                When you initiate a payment without enough balance, it stays here. Once you top up your wallet, our system automatically processes these payments partial or full!
+                            <Text className="text-sm font-black text-white">Smart Automation</Text>
+                            <Text className="text-xs text-brand-100 leading-relaxed mt-1 font-medium">
+                                When balance is low, intents are queued. Top up to trigger immediate settlement. Our system handles the rest!
                             </Text>
                         </VStack>
                     </Box>

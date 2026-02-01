@@ -26,9 +26,9 @@ export default function RegisterScreen() {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <Box className="px-8 flex-1">
-                <Pressable onPress={() => router.back()} className="mt-4 w-10 h-10 items-center justify-center rounded-xl bg-gray-50 dark:bg-slate-800">
+                <Pressable onPress={() => router.back()} className="mt-4 w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
                     <ArrowLeft size={20} color="#64748b" />
                 </Pressable>
 
@@ -39,8 +39,8 @@ export default function RegisterScreen() {
 
                 <VStack space="lg" className="flex-1">
                     <VStack space="xs">
-                        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Full Name</Text>
-                        <Input className="h-14 rounded-2xl bg-gray-50 border-none dark:bg-slate-800">
+                        <Text className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Full Name</Text>
+                        <Input className="h-16 rounded-2xl bg-white border border-slate-200 dark:border-slate-800 dark:bg-slate-900 focus:border-brand-500">
                             <InputSlot className="pl-4">
                                 <InputIcon as={User} color="#64748b" />
                             </InputSlot>
@@ -49,8 +49,8 @@ export default function RegisterScreen() {
                     </VStack>
 
                     <VStack space="xs">
-                        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</Text>
-                        <Input className="h-14 rounded-2xl bg-gray-50 border-none dark:bg-slate-800">
+                        <Text className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Email Address</Text>
+                        <Input className="h-16 rounded-2xl bg-white border border-slate-200 dark:border-slate-800 dark:bg-slate-900 focus:border-brand-500">
                             <InputSlot className="pl-4">
                                 <InputIcon as={Mail} color="#64748b" />
                             </InputSlot>
@@ -59,8 +59,8 @@ export default function RegisterScreen() {
                     </VStack>
 
                     <VStack space="xs">
-                        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</Text>
-                        <Input className="h-14 rounded-2xl bg-gray-50 border-none dark:bg-slate-800">
+                        <Text className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Password</Text>
+                        <Input className="h-16 rounded-2xl bg-white border border-slate-200 dark:border-slate-800 dark:bg-slate-900 focus:border-brand-500">
                             <InputSlot className="pl-4">
                                 <InputIcon as={Lock} color="#64748b" />
                             </InputSlot>
@@ -80,13 +80,13 @@ export default function RegisterScreen() {
                                 <CheckboxIcon as={CheckIcon} />
                             </CheckboxIndicator>
                             <CheckboxLabel className="text-xs text-gray-500 ml-2">
-                                I agree to the <Text className="text-indigo-600 font-bold text-xs uppercase">Terms of Service</Text> and <Text className="text-indigo-600 font-bold text-xs uppercase">Privacy Policy</Text>
+                                I agree to the <Text className="text-brand-600 font-bold text-xs uppercase">Terms of Service</Text> and <Text className="text-brand-600 font-bold text-xs uppercase">Privacy Policy</Text>
                             </CheckboxLabel>
                         </Checkbox>
                     </Box>
 
                     <Button
-                        className="h-14 rounded-2xl bg-indigo-600 mt-6 shadow-lg shadow-indigo-100"
+                        className="h-16 rounded-2xl bg-brand-600 mt-6 shadow-xl shadow-brand-200"
                         onPress={() => router.replace('/(tabs)')}
                     >
                         <ButtonText className="font-bold">Register Now</ButtonText>
@@ -95,7 +95,7 @@ export default function RegisterScreen() {
                     <HStack justifyContent="center" alignItems="center" space="xs" className="mt-2">
                         <Text className="text-gray-500 text-sm">Already have an account?</Text>
                         <Pressable onPress={() => router.push('/login')}>
-                            <Text className="text-indigo-600 font-bold text-sm">Log In</Text>
+                            <Text className="text-brand-600 font-bold text-sm">Log In</Text>
                         </Pressable>
                     </HStack>
                 </VStack>

@@ -11,7 +11,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const activeColor = '#4f46e5'; // Indigo 600
+  const activeColor = '#0ea5e9'; // Brand Sky Blue
 
   return (
     <Tabs

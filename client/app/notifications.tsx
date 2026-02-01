@@ -32,7 +32,7 @@ export default function NotificationsScreen() {
             message: '₹1,500 was automatically transferred to Mahesh Shinde for "Monthly Rent".',
             time: '2 mins ago',
             icon: Zap,
-            iconColor: '#4f46e5',
+            iconColor: '#0ea5e9',
             isNew: true
         },
         {
@@ -68,28 +68,26 @@ export default function NotificationsScreen() {
     ];
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
-            <Box className="px-6 py-4 flex-row items-center border-b border-gray-50 dark:border-slate-800">
-                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-gray-50 dark:bg-slate-800 mr-4">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
+            <Box className="px-6 py-4 flex-row items-center justify-between">
+                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 shadow-sm">
                     <ArrowLeft size={20} color="#64748b" />
                 </Pressable>
-                <Text className="text-xl font-bold dark:text-white flex-1">Notifications</Text>
-                <Pressable>
-                    <MoreHorizontal size={24} color="#64748b" />
-                </Pressable>
+                <Text className="text-lg font-bold dark:text-white">Notifications</Text>
+                <Box className="w-10" />
             </Box>
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <VStack className="py-2">
                     {notifications.map((notif) => (
-                        <Pressable key={notif.id} className={`px-6 py-5 flex-row space-x-4 ${notif.isNew ? 'bg-indigo-50/30 dark:bg-indigo-900/10' : ''}`}>
-                            <Box className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-gray-50 dark:border-slate-700">
+                        <Pressable key={notif.id} className={`px-6 py-5 flex-row space-x-4 ${notif.isNew ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''}`}>
+                            <Box className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
                                 <notif.icon size={22} color={notif.iconColor} />
                             </Box>
                             <VStack className="flex-1" space="xs">
                                 <HStack justifyContent="space-between" alignItems="center">
-                                    <Text className={`font-bold text-sm dark:text-white ${notif.isNew ? 'text-indigo-900' : ''}`}>{notif.title}</Text>
-                                    {notif.isNew && <Box className="w-2 h-2 rounded-full bg-indigo-600" />}
+                                    <Text className={`font-bold text-sm dark:text-white ${notif.isNew ? 'text-brand-900' : 'text-slate-900'}`}>{notif.title}</Text>
+                                    {notif.isNew && <Box className="w-2 h-2 rounded-full bg-brand-600" />}
                                 </HStack>
                                 <Text className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{notif.message}</Text>
                                 <Text className="text-[10px] text-gray-400 font-medium mt-1">{notif.time}</Text>

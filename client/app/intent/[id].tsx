@@ -51,9 +51,9 @@ export default function IntentDetailsScreen() {
     const progress = (intent.settledAmount / intent.totalAmount) * 100;
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
-            <Box className="px-6 py-4 flex-row items-center border-b border-gray-50 dark:border-slate-800">
-                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-gray-50 dark:bg-slate-800 mr-4">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
+            <Box className="px-6 py-4 flex-row items-center border-b border-transparent">
+                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800 mr-4">
                     <ArrowLeft size={20} color="#64748b" />
                 </Pressable>
                 <Text className="text-xl font-bold dark:text-white flex-1">Intent Timeline</Text>
@@ -61,11 +61,11 @@ export default function IntentDetailsScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} className="px-6">
                 {/* Summary Card */}
-                <Box className="bg-indigo-600 rounded-[32px] p-8 mt-6">
+                <Box className="bg-brand-600 rounded-[32px] p-8 mt-6 shadow-xl shadow-brand-200">
                     <VStack space="md">
                         <HStack justifyContent="space-between" alignItems="center">
-                            <Text className="text-indigo-100 font-bold uppercase tracking-widest text-xs">Total Amount</Text>
-                            <Badge action="warning" variant="solid" className="bg-indigo-400/30 rounded-full border-none px-3">
+                            <Text className="text-brand-100 font-bold uppercase tracking-widest text-xs">Total Amount</Text>
+                            <Badge action="warning" variant="solid" className="bg-brand-400/30 rounded-full border-none px-3">
                                 <BadgeText className="text-[10px] text-white">AUTO-TRIGGER ACTIVE</BadgeText>
                             </Badge>
                         </HStack>
@@ -73,10 +73,10 @@ export default function IntentDetailsScreen() {
 
                         <VStack space="xs" className="mt-4">
                             <HStack justifyContent="space-between">
-                                <Text className="text-indigo-100 text-xs">Settled so far</Text>
+                                <Text className="text-brand-100 text-xs">Settled so far</Text>
                                 <Text className="text-white text-xs font-bold">{progress.toFixed(0)}%</Text>
                             </HStack>
-                            <Progress value={progress} className="h-2 bg-indigo-500/50 rounded-full">
+                            <Progress value={progress} className="h-2 bg-brand-500/50 rounded-full">
                                 <ProgressFilledTrack className="bg-white" />
                             </Progress>
                         </VStack>
@@ -96,11 +96,11 @@ export default function IntentDetailsScreen() {
                 </Box>
 
                 {/* Info Box */}
-                <Box className="mt-6 bg-blue-50 dark:bg-slate-800 p-5 rounded-[24px] flex-row space-x-4 items-start border border-blue-100 dark:border-slate-700">
-                    <Zap size={22} color="#3b82f6" fill="#3b82f6" style={{ marginTop: 2 }} />
+                <Box className="mt-6 bg-brand-50 dark:bg-brand-950/20 p-5 rounded-[24px] flex-row space-x-4 items-start border border-brand-100 dark:border-brand-900/40">
+                    <Zap size={22} color="#0ea5e9" fill="#0ea5e9" style={{ marginTop: 2 }} />
                     <VStack className="flex-1">
-                        <Text className="text-sm font-bold text-blue-900 dark:text-blue-200">Auto-Settle Logic</Text>
-                        <Text className="text-[11px] text-blue-700 dark:text-blue-400 leading-relaxed mt-1">
+                        <Text className="text-sm font-bold text-brand-900 dark:text-brand-200">Auto-Settle Logic</Text>
+                        <Text className="text-[11px] text-brand-700 dark:text-brand-400 leading-relaxed mt-1">
                             Every time you add money to your wallet, our engine pulls the maximum possible amount from your balance to settle this intent. No manual intervention needed.
                         </Text>
                     </VStack>
@@ -124,12 +124,12 @@ export default function IntentDetailsScreen() {
                                 <CheckCircle2 size={12} color="#16a34a" />
                             </Box>
 
-                            <VStack className="flex-1 bg-gray-50 dark:bg-slate-800 p-4 rounded-2xl">
+                            <VStack className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                                 <HStack justifyContent="space-between" alignItems="center">
                                     <Text className="font-bold dark:text-white">₹ {item.amount.toLocaleString()}</Text>
-                                    <Text className="text-[10px] text-gray-500">{item.date}</Text>
+                                    <Text className="text-[10px] text-slate-500">{item.date}</Text>
                                 </HStack>
-                                <Text className="text-[10px] text-gray-400 mt-1">Settlement triggered at {item.time}</Text>
+                                <Text className="text-[10px] text-slate-400 mt-1">Settlement triggered at {item.time}</Text>
                             </VStack>
                         </HStack>
                     ))}

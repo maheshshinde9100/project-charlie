@@ -11,6 +11,7 @@ import {
     ButtonText,
     Avatar,
     AvatarFallbackText,
+    AvatarImage,
     Icon,
     Pressable,
     Toast,
@@ -51,7 +52,7 @@ export default function SendMoneyScreen() {
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <Box className="px-6 py-4 flex-row justify-between items-center">
                 <Pressable onPress={() => router.back()}>
                     <X size={24} color="#64748b" />
@@ -65,9 +66,9 @@ export default function SendMoneyScreen() {
                     {/* Receiver Selection */}
                     <VStack space="xs">
                         <Text className="text-xs font-bold text-gray-400 p-1 uppercase">To</Text>
-                        <HStack className="bg-gray-50 dark:bg-slate-800 p-4 rounded-3xl items-center justify-between">
+                        <HStack className="bg-white dark:bg-slate-800 p-4 rounded-3xl items-center justify-between border border-slate-100 dark:border-slate-800 shadow-sm">
                             <HStack space="md" alignItems="center">
-                                <Avatar size="md" className="bg-indigo-100">
+                                <Avatar size="md" className="bg-brand-100">
                                     <AvatarFallbackText>{receiver}</AvatarFallbackText>
                                     <AvatarImage source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }} />
                                 </Avatar>
@@ -77,7 +78,7 @@ export default function SendMoneyScreen() {
                                 </VStack>
                             </HStack>
                             <Pressable>
-                                <Text className="text-indigo-600 font-bold text-sm">Change</Text>
+                                <Text className="text-brand-600 font-bold text-sm">Change</Text>
                             </Pressable>
                         </HStack>
                     </VStack>
@@ -105,11 +106,11 @@ export default function SendMoneyScreen() {
 
                     {/* Insufficient Balance Info */}
                     {isInsufficient && (
-                        <Box className="bg-orange-50 dark:bg-orange-950/20 p-5 rounded-3xl border border-orange-100 dark:border-orange-900/40">
+                        <Box className="bg-amber-50 dark:bg-amber-950/20 p-5 rounded-3xl border border-amber-100 dark:border-amber-900/40">
                             <HStack space="md" alignItems="flex-start">
-                                <AlertTriangle size={24} color="#ea580c" />
+                                <AlertTriangle size={24} color="#f59e0b" />
                                 <VStack className="flex-1">
-                                    <Text className="text-orange-900 dark:text-orange-300 font-bold text-sm">Create Auto-Trigger Intent?</Text>
+                                    <Text className="text-amber-900 dark:text-amber-300 font-bold text-sm">Create Auto-Trigger Intent?</Text>
                                     <Text className="text-orange-700 dark:text-orange-400 text-xs mt-1 leading-relaxed">
                                         You don't have enough balance. If you proceed, we will record this as a "Pending Intent" and pay {receiver} automatically as soon as you add funds to your wallet.
                                     </Text>
@@ -122,7 +123,7 @@ export default function SendMoneyScreen() {
                     <VStack space="md" className="mt-4 pb-10">
                         <Button
                             size="xl"
-                            className={`rounded-2xl h-16 ${isInsufficient ? 'bg-orange-600' : 'bg-indigo-600'}`}
+                            className={`rounded-2xl h-16 shadow-xl ${isInsufficient ? 'bg-amber-600 shadow-amber-200' : 'bg-brand-600 shadow-brand-200'}`}
                             onPress={handleSend}
                         >
                             <ButtonText className="font-bold">

@@ -36,12 +36,12 @@ export default function HistoryScreen() {
     const router = useRouter();
 
     return (
-        <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
+        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <Box className="px-6 py-4">
                 <HStack justifyContent="space-between" alignItems="center" className="mb-4">
                     <Text className="text-2xl font-bold dark:text-white">Activity</Text>
-                    <Box className="bg-gray-100 dark:bg-slate-800 p-2 rounded-full">
-                        <Download size={20} color="#64748b" />
+                    <Box className="bg-brand-100 dark:bg-brand-900/30 p-2.5 rounded-2xl shadow-sm">
+                        <Download size={20} color="#0ea5e9" />
                     </Box>
                 </HStack>
 
@@ -52,8 +52,8 @@ export default function HistoryScreen() {
                         </InputSlot>
                         <InputField placeholder="Search transactions..." className="text-sm" />
                     </Input>
-                    <Box className="bg-gray-100 dark:bg-slate-800 h-12 w-12 items-center justify-center rounded-2xl">
-                        <Filter size={20} color="#64748b" />
+                    <Box className="bg-white dark:bg-slate-800 h-12 w-12 items-center justify-center rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                        <Filter size={20} color="#0ea5e9" />
                     </Box>
                 </HStack>
             </Box>
@@ -89,11 +89,11 @@ function TransactionItem({ title, type, amount, date, time, category }: any) {
     return (
         <HStack justifyContent="space-between" alignItems="center" className="py-2">
             <HStack space="md" alignItems="center">
-                <Box className={`w-12 h-12 rounded-2xl items-center justify-center ${type === 'received' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-slate-800'}`}>
+                <Box className={`w-14 h-14 rounded-[20px] items-center justify-center shadow-sm ${type === 'received' ? 'bg-emerald-50 dark:bg-emerald-950/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
                     {type === 'received' ? (
-                        <ArrowDownLeft size={22} color="#16a34a" />
+                        <ArrowDownLeft size={24} color="#10b981" />
                     ) : (
-                        <ArrowUpRight size={22} color="#64748b" />
+                        <ArrowUpRight size={24} color="#64748b" />
                     )}
                 </Box>
                 <VStack>
@@ -102,7 +102,7 @@ function TransactionItem({ title, type, amount, date, time, category }: any) {
                 </VStack>
             </HStack>
             <VStack alignItems="flex-end">
-                <Text className={`font-bold ${type === 'received' ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
+                <Text className={`font-black text-lg ${type === 'received' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'}`}>
                     {type === 'received' ? '+' : '-'}₹{amount}
                 </Text>
                 <Text className="text-[10px] text-gray-400">{date}</Text>
