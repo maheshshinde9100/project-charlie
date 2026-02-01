@@ -18,9 +18,16 @@ export default function RootLayout() {
   return (
     <GluestackUIProvider config={config}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="welcome" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="send" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="topup" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="notifications" options={{ presentation: 'card' }} />
+          <Stack.Screen name="transaction/[id]" options={{ presentation: 'card' }} />
+          <Stack.Screen name="intent/[id]" options={{ presentation: 'card' }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
