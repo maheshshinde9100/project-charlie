@@ -23,9 +23,11 @@ import {
     Wallet,
     CreditCard
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
+    const router = useRouter();
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -84,12 +86,15 @@ export default function ProfileScreen() {
                         <VStack className="bg-gray-50 dark:bg-slate-800 rounded-3xl overflow-hidden">
                             <ProfileItem icon={Settings} label="Account Settings" />
                             <Divider className="bg-gray-100 dark:bg-slate-700 mx-4" />
-                            <ProfileItem icon={Bell} label="Notifications" />
+                            <ProfileItem icon={Bell} label="Notifications" onPress={() => router.push('/notifications')} />
                             <Divider className="bg-gray-100 dark:bg-slate-700 mx-4" />
                             <ProfileItem icon={CircleHelp} label="Help & Support" />
                         </VStack>
 
-                        <Pressable className="bg-red-50 dark:bg-red-900/10 rounded-3xl p-4 items-center flex-row justify-center space-x-2 mt-4">
+                        <Pressable
+                            onPress={() => router.replace('/welcome')}
+                            className="bg-red-50 dark:bg-red-900/10 rounded-3xl p-4 items-center flex-row justify-center space-x-2 mt-4"
+                        >
                             <LogOut size={20} color="#ef4444" />
                             <Text className="text-red-600 font-bold">Logout</Text>
                         </Pressable>
@@ -100,9 +105,9 @@ export default function ProfileScreen() {
     );
 }
 
-function ProfileItem({ icon: IconComponent, label }: any) {
+function ProfileItem({ icon: IconComponent, label, onPress }: any) {
     return (
-        <Pressable>
+        <Pressable onPress={onPress}>
             <HStack justifyContent="space-between" alignItems="center" className="px-5 py-4">
                 <HStack space="md" alignItems="center">
                     <Box className="bg-indigo-100 dark:bg-indigo-900/30 p-2 rounded-xl">

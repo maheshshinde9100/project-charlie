@@ -10,7 +10,8 @@ import {
     Input,
     InputField,
     InputIcon,
-    InputSlot
+    InputSlot,
+    Pressable
 } from '@gluestack-ui/themed';
 import {
     Search,
@@ -19,18 +20,20 @@ import {
     Filter,
     Download
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HistoryScreen() {
     const transactions = [
-        { id: '1', title: 'John Doe', type: 'sent', amount: 500, date: 'Feb 01, 2025', time: '10:30 AM', category: 'Transfer' },
+        { id: '1', title: 'Mahesh Shinde', type: 'sent', amount: 500, date: 'Feb 01, 2025', time: '10:30 AM', category: 'Transfer' },
         { id: '2', title: 'Wallet Top-up', type: 'received', amount: 2000, date: 'Jan 28, 2025', time: '11:20 AM', category: 'Deposit' },
         { id: '3', title: 'Zomato Merchant', type: 'sent', amount: 450, date: 'Jan 27, 2025', time: '08:45 PM', category: 'Food' },
         { id: '4', title: 'Starbucks Coffee', type: 'sent', amount: 320, date: 'Jan 25, 2025', time: '09:15 AM', category: 'Beverage' },
         { id: '5', title: 'Netflix Subscription', type: 'sent', amount: 199, date: 'Jan 22, 2025', time: '04:00 PM', category: 'Entertainment' },
-        { id: '6', title: 'Sarah Jenkins', type: 'received', amount: 1500, date: 'Jan 20, 2025', time: '02:30 PM', category: 'Transfer' },
+        { id: '6', title: 'Peter Parker', type: 'received', amount: 1500, date: 'Jan 20, 2025', time: '02:30 PM', category: 'Transfer' },
         { id: '7', title: 'Uber Ride', type: 'sent', amount: 280, date: 'Jan 18, 2025', time: '06:20 PM', category: 'Transport' },
     ];
+    const router = useRouter();
 
     return (
         <SafeAreaView className="flex-1 bg-white dark:bg-slate-900">
@@ -59,12 +62,22 @@ export default function HistoryScreen() {
                 <VStack space="lg" className="pb-10">
                     <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest">February 2025</Text>
                     {transactions.filter(t => t.date.includes('Feb')).map((tx) => (
-                        <TransactionItem key={tx.id} {...tx} />
+                        <Pressable key={tx.id} onPress={() => router.push({
+                            pathname: "/transaction/[id]",
+                            params: { id: tx.id }
+                        })}>
+                            <TransactionItem {...tx} />
+                        </Pressable>
                     ))}
 
                     <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-4">January 2025</Text>
                     {transactions.filter(t => t.date.includes('Jan')).map((tx) => (
-                        <TransactionItem key={tx.id} {...tx} />
+                        <Pressable key={tx.id} onPress={() => router.push({
+                            pathname: "/transaction/[id]",
+                            params: { id: tx.id }
+                        })}>
+                            <TransactionItem {...tx} />
+                        </Pressable>
                     ))}
                 </VStack>
             </ScrollView>

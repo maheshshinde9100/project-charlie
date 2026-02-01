@@ -13,7 +13,8 @@ import {
     Button,
     ButtonText,
     Divider,
-    Icon
+    Icon,
+    Pressable
 } from '@gluestack-ui/themed';
 import {
     Clock,
@@ -23,9 +24,11 @@ import {
     History,
     ArrowRight
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function IntentsScreen() {
+    const router = useRouter();
     const intents = [
         {
             id: '1',
@@ -34,7 +37,7 @@ export default function IntentsScreen() {
             totalAmount: 12000,
             settledAmount: 4000,
             status: 'Partial',
-            date: 'Feb 01, 2025',
+            date: 'Feb 01, 2026',
             priority: 'High'
         },
         {
@@ -44,7 +47,7 @@ export default function IntentsScreen() {
             totalAmount: 4500,
             settledAmount: 0,
             status: 'Pending',
-            date: 'Jan 30, 2025',
+            date: 'Jan 30, 2026',
             priority: 'Medium'
         },
         {
@@ -54,7 +57,7 @@ export default function IntentsScreen() {
             totalAmount: 5000,
             settledAmount: 5000,
             status: 'Completed',
-            date: 'Jan 15, 2025',
+            date: 'Jan 15, 2026',
             priority: 'Routine'
         },
     ];
@@ -69,8 +72,12 @@ export default function IntentsScreen() {
             <ScrollView className="px-6" showsVerticalScrollIndicator={false}>
                 <VStack space="xl" className="pb-10">
                     {intents.map((intent) => (
-                        <Box
+                        <Pressable
                             key={intent.id}
+                            onPress={() => router.push({
+                                pathname: "/intent/[id]",
+                                params: { id: intent.id }
+                            })}
                             className={`p-5 rounded-3xl border ${intent.status === 'Completed' ? 'border-gray-100 bg-gray-50/50 dark:bg-slate-800/30' : 'border-indigo-100 bg-indigo-50/30 dark:border-slate-700 dark:bg-slate-800'}`}
                         >
                             <HStack justifyContent="space-between" alignItems="flex-start" className="mb-4">
@@ -109,7 +116,7 @@ export default function IntentsScreen() {
                                     <Icon as={ArrowRight} className="ml-1" size="sm" color="#4f46e5" />
                                 </Button>
                             </HStack>
-                        </Box>
+                        </Pressable>
                     ))}
 
                     {/* Info Card */}
