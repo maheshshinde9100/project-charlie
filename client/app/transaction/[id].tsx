@@ -1,0 +1,139 @@
+import React from 'react';
+import { ScrollView, Share } from 'react-native';
+import {
+    Box,
+    VStack,
+    HStack,
+    Text,
+    Pressable,
+    Icon,
+    Divider,
+    Button,
+    ButtonText,
+    Avatar,
+    AvatarFallbackText
+} from '@gluestack-ui/themed';
+import {
+    ArrowLeft,
+    Download,
+    Share2,
+    CheckCircle2,
+    ExternalLink,
+    Copy,
+    Receipt
+} from 'lucide-react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function TransactionDetailsScreen() {
+    const router = useRouter();
+    const { id } = useLocalSearchParams();
+
+    // Mock data - In a real app, fetch using ID
+    const tx = {
+        id: id || 'TXN_9823471',
+        title: 'John Doe',
+        amount: '₹ 500.00',
+        status: 'Success',
+        date: 'February 01, 2025',
+        time: '10:30 AM',
+        paymentMethod: 'Wallet Balance',
+        transactionId: 'UTI7283947192837',
+        vpa: 'john.doe@okaxis',
+        category: 'Transfer'
+    };
+
+    const onShare = async () => {
+        try {
+            await Share.share({
+                message: `Payment of ${tx.amount} to ${tx.title} was successful. Transaction ID: ${tx.transactionId}`,
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return (
+        <SafeAreaView className="flex-1 bg-gray-50 dark:bg-slate-900">
+            <Box className="px-6 py-4 flex-row justify-between items-center">
+                <Pressable onPress={() => router.back()} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm">
+                    <ArrowLeft size={20} color="#64748b" />
+                </Pressable>
+                <Text className="text-lg font-bold dark:text-white">Receipt</Text>
+                <Pressable onPress={onShare} className="w-10 h-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm">
+                    <Share2 size={20} color="#64748b" />
+                </Pressable>
+            </Box>
+
+            <ScrollView showsVerticalScrollIndicator={false} className="px-6">
+                {/* Receipt Concept Card */}
+                <Box className="bg-white dark:bg-slate-800 rounded-[32px] p-8 mt-4 shadow-sm border border-gray-100 dark:border-slate-700">
+                    <VStack alignItems="center" space="md">
+                        <Box className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
+                            <CheckCircle2 size={40} color="#16a34a" />
+                        </Box>
+                        <VStack alignItems="center" space="xs">
+                            <Text className="text-green-600 font-bold uppercase tracking-wider text-xs">Payment Successful</Text>
+                            <Text className="text-4xl font-black dark:text-white">{tx.amount}</Text>
+                        </VStack>
+
+                        <Divider className="my-4 bg-gray-100 dark:bg-slate-700" />
+
+                        <HStack space="md" alignItems="center" className="w-full">
+                            <Avatar size="md" className="bg-indigo-100">
+                                <AvatarFallbackText>{tx.title}</AvatarFallbackText>
+                            </Avatar>
+                            <VStack className="flex-1">
+                                <Text className="font-bold text-lg dark:text-white">{tx.title}</Text>
+                                <Text className="text-xs text-gray-500">{tx.vpa}</Text>
+                            </VStack>
+                        </HStack>
+                    </VStack>
+
+                    <VStack space="lg" className="mt-8">
+                        <DetailRow label="Date & Time" value={`${tx.date}, ${tx.time}`} />
+                        <DetailRow label="Payment Method" value={tx.paymentMethod} />
+                        <DetailRow label="Category" value={tx.category} />
+                        <DetailRow
+                            label="Transaction ID"
+                            value={tx.transactionId}
+                            isCopyable
+                            onCopy={() => { }}
+                        />
+                    </VStack>
+
+                    <Box className="mt-10 bg-gray-50 dark:bg-slate-900 p-4 rounded-2xl flex-row items-center space-x-3">
+                        <Receipt size={20} color="#64748b" />
+                        <Text className="text-gray-500 text-xs flex-1">This payment was processed securely. No extra fees were charged.</Text>
+                    </Box>
+                </Box>
+
+                <VStack space="md" className="mt-8 mb-10">
+                    <Button size="xl" className="bg-indigo-600 rounded-2xl h-16 shadow-lg shadow-indigo-100">
+                        <Icon as={Download} size="md" className="mr-2" color="white" />
+                        <ButtonText className="font-bold">Download PDF Receipt</ButtonText>
+                    </Button>
+                    <Button variant="outline" size="xl" className="border-gray-200 dark:border-slate-700 rounded-2xl h-16">
+                        <ButtonText className="text-gray-700 dark:text-gray-200 font-bold">Report an Issue</ButtonText>
+                    </Button>
+                </VStack>
+            </ScrollView>
+        </SafeAreaView>
+    );
+}
+
+function DetailRow({ label, value, isCopyable, onCopy }: any) {
+    return (
+        <HStack justifyContent="space-between" alignItems="center">
+            <Text className="text-gray-400 text-sm">{label}</Text>
+            <HStack space="xs" alignItems="center">
+                <Text className="font-semibold text-sm dark:text-white">{value}</Text>
+                {isCopyable && (
+                    <Pressable onPress={onCopy}>
+                        <Copy size={14} color="#4f46e5" />
+                    </Pressable>
+                )}
+            </HStack>
+        </HStack>
+    );
+}
