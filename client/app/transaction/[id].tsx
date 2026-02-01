@@ -82,6 +82,7 @@ export default function TransactionDetailsScreen() {
                         <HStack space="md" alignItems="center" className="w-full">
                             <Avatar size="md" className="bg-indigo-100">
                                 <AvatarFallbackText>{tx.title}</AvatarFallbackText>
+                                <AvatarImage source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }} />
                             </Avatar>
                             <VStack className="flex-1">
                                 <Text className="font-bold text-lg dark:text-white">{tx.title}</Text>

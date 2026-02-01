@@ -65,7 +65,7 @@ export default function DashboardScreen() {
               <Avatar size="md">
                 <AvatarFallbackText>Mahesh Shinde</AvatarFallbackText>
                 <AvatarImage
-                  source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=100&auto=format&fit=crop' }}
+                  source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }}
                 />
               </Avatar>
             </HStack>

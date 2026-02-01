@@ -69,6 +69,7 @@ export default function SendMoneyScreen() {
                             <HStack space="md" alignItems="center">
                                 <Avatar size="md" className="bg-indigo-100">
                                     <AvatarFallbackText>{receiver}</AvatarFallbackText>
+                                    <AvatarImage source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }} />
                                 </Avatar>
                                 <VStack>
                                     <Text className="font-bold dark:text-white">{receiver}</Text>

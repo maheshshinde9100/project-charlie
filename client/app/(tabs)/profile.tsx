@@ -33,7 +33,7 @@ export default function ProfileScreen() {
                     <Avatar size="xl" className="mb-4 bg-indigo-100">
                         <AvatarFallbackText>Mahesh Shinde</AvatarFallbackText>
                         <AvatarImage
-                            source={{ uri: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' }}
+                            source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }}
                         />
                     </Avatar>
                     <Text className="text-2xl font-bold dark:text-white">Mahesh Shinde</Text>
