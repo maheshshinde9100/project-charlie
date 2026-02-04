@@ -7,5 +7,6 @@ router.post('/initiate', auth, paymentController.initiatePayment);
 router.get('/history', auth, paymentController.getHistory);
 router.get('/intents', auth, paymentController.getIntents);
 router.get('/intents/:id', auth, paymentController.getIntentDetails);
+router.get('/transaction/:id', auth, paymentController.getTransactionDetails);
 
 module.exports = router;
