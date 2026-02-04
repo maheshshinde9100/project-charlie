@@ -23,22 +23,41 @@ import {
     Wallet,
     CreditCard
 } from 'lucide-react-native';
+import { auth } from '../../services/api';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState, useEffect } from 'react';
 
 export default function ProfileScreen() {
     const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        loadUser();
+    }, []);
+
+    const loadUser = async () => {
+        const userData = await auth.getCurrentUser();
+        if (userData) setUser(userData);
+    };
+
+    const handleLogout = async () => {
+        await auth.logout();
+        router.replace('/welcome');
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Box className="px-6 py-8 items-center">
-                    <Avatar size="xl" className="mb-4 bg-indigo-100">
-                        <AvatarFallbackText>Mahesh Shinde</AvatarFallbackText>
+                    <Avatar size="xl" className="mb-4 bg-brand-100">
+                        <AvatarFallbackText>{user?.name || 'User'}</AvatarFallbackText>
                         <AvatarImage
-                            source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }}
+                            source={{ uri: user?.avatar || 'https://avatars.githubusercontent.com/u/120265441' }}
                         />
                     </Avatar>
-                    <Text className="text-2xl font-black dark:text-white">Mahesh Shinde</Text>
+                    <Text className="text-2xl font-black dark:text-white">{user?.name || 'Loading...'}</Text>
+                    <Text className="text-gray-500 font-medium mb-1">{user?.email || '...'}</Text>
                     <Box className="bg-brand-100 dark:bg-brand-900/30 px-3 py-1 rounded-full mt-1">
                         <Text className="text-brand-700 dark:text-brand-300 text-[10px] font-bold uppercase tracking-widest">Premium Member</Text>
                     </Box>
@@ -95,7 +114,7 @@ export default function ProfileScreen() {
                         </VStack>
 
                         <Pressable
-                            onPress={() => router.replace('/welcome')}
+                            onPress={handleLogout}
                             className="bg-red-50 dark:bg-red-900/10 rounded-3xl p-4 items-center flex-row justify-center space-x-2 mt-4"
                         >
                             <LogOut size={20} color="#ef4444" />

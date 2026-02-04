@@ -17,13 +17,38 @@ import {
     CheckIcon,
     CheckboxLabel
 } from '@gluestack-ui/themed';
-import { User, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
+import { auth } from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { User, Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react-native'; // Re-adding icon imports that were removed or implicit
 
 export default function RegisterScreen() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [agreed, setAgreed] = useState(false);
+
+    const handleRegister = async () => {
+        if (!name || !email || !password) return Alert.alert("Error", "Please fill all fields");
+        if (!agreed) return Alert.alert("Error", "Please agree to terms");
+
+        setLoading(true);
+        try {
+            const res = await auth.register(name, email, password);
+            await AsyncStorage.setItem('token', res.data.token);
+            await AsyncStorage.setItem('user', JSON.stringify(res.data.user));
+            router.replace('/(tabs)');
+        } catch (err: any) {
+            Alert.alert("Registration Failed", err.response?.data?.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -44,7 +69,7 @@ export default function RegisterScreen() {
                             <InputSlot className="pl-4">
                                 <InputIcon as={User} color="#64748b" />
                             </InputSlot>
-                            <InputField placeholder="Mahesh Shinde" />
+                            <InputField placeholder="Mahesh Shinde" value={name} onChangeText={setName} />
                         </Input>
                     </VStack>
 
@@ -54,7 +79,7 @@ export default function RegisterScreen() {
                             <InputSlot className="pl-4">
                                 <InputIcon as={Mail} color="#64748b" />
                             </InputSlot>
-                            <InputField placeholder="hello@mahesh.com" />
+                            <InputField placeholder="hello@mahesh.com" value={email} onChangeText={setEmail} autoCapitalize="none" />
                         </Input>
                     </VStack>
 
@@ -67,6 +92,8 @@ export default function RegisterScreen() {
                             <InputField
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="********"
+                                value={password}
+                                onChangeText={setPassword}
                             />
                             <InputSlot className="pr-4" onPress={() => setShowPassword(!showPassword)}>
                                 <InputIcon as={showPassword ? EyeOff : Eye} color="#64748b" />
@@ -75,7 +102,7 @@ export default function RegisterScreen() {
                     </VStack>
 
                     <Box className="mt-2">
-                        <Checkbox aria-label="Terms and Conditions" value="terms">
+                        <Checkbox aria-label="Terms and Conditions" value="terms" isChecked={agreed} onChange={setAgreed}>
                             <CheckboxIndicator className="rounded-md border-gray-200">
                                 <CheckboxIcon as={CheckIcon} />
                             </CheckboxIndicator>
@@ -87,9 +114,10 @@ export default function RegisterScreen() {
 
                     <Button
                         className="h-16 rounded-2xl bg-brand-600 mt-6 shadow-xl shadow-brand-200"
-                        onPress={() => router.replace('/(tabs)')}
+                        onPress={handleRegister}
+                        isDisabled={loading}
                     >
-                        <ButtonText className="font-bold">Register Now</ButtonText>
+                        <ButtonText className="font-bold">{loading ? "Creating Account..." : "Register Now"}</ButtonText>
                     </Button>
 
                     <HStack justifyContent="center" alignItems="center" space="xs" className="mt-2">

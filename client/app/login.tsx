@@ -14,12 +14,34 @@ import {
     Divider
 } from '@gluestack-ui/themed';
 import { Mail, Lock, Eye, EyeOff, Github, ArrowLeft } from 'lucide-react-native';
+import { auth } from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+        if (!email || !password) return Alert.alert("Error", "Please fill all fields");
+
+        setLoading(true);
+        try {
+            const res = await auth.login(email, password);
+            await AsyncStorage.setItem('token', res.data.token);
+            await AsyncStorage.setItem('user', JSON.stringify(res.data.user));
+            router.replace('/(tabs)');
+        } catch (err: any) {
+            Alert.alert("Login Failed", err.response?.data?.message || "Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -40,7 +62,7 @@ export default function LoginScreen() {
                             <InputSlot className="pl-4">
                                 <InputIcon as={Mail} color="#64748b" />
                             </InputSlot>
-                            <InputField placeholder="hello@mahesh.com" />
+                            <InputField placeholder="hello@mahesh.com" value={email} onChangeText={setEmail} autoCapitalize="none" />
                         </Input>
                     </VStack>
 
@@ -53,6 +75,8 @@ export default function LoginScreen() {
                             <InputField
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="********"
+                                value={password}
+                                onChangeText={setPassword}
                             />
                             <InputSlot className="pr-4" onPress={() => setShowPassword(!showPassword)}>
                                 <InputIcon as={showPassword ? EyeOff : Eye} color="#64748b" />
@@ -65,9 +89,10 @@ export default function LoginScreen() {
 
                     <Button
                         className="h-16 rounded-2xl bg-brand-600 mt-6 shadow-xl shadow-brand-200"
-                        onPress={() => router.replace('/(tabs)')}
+                        onPress={handleLogin}
+                        isDisabled={loading}
                     >
-                        <ButtonText className="font-bold">Log In</ButtonText>
+                        <ButtonText className="font-bold">{loading ? "Logging in..." : "Log In"}</ButtonText>
                     </Button>
 
                     <HStack alignItems="center" space="md" className="mt-4">
