@@ -2,9 +2,6 @@
 
 i created this api documentation for the API endpoints required for my current frontend and also for the Auto-Triggered Payment Service.
 
-## Base URL
-`https://api.autotrigger.com/v1`
-
 ---
 
 ## 1. Authentication
