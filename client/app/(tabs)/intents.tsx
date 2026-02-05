@@ -27,40 +27,29 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useState, useEffect } from 'react';
+import { payments } from '../../services/api';
+
 export default function IntentsScreen() {
     const router = useRouter();
-    const intents = [
-        {
-            id: '1',
-            title: 'Monthly Rent Payment',
-            receiver: 'Mahesh Shinde',
-            totalAmount: 12000,
-            settledAmount: 4000,
-            status: 'Partial',
-            date: 'Feb 01, 2026',
-            priority: 'High'
-        },
-        {
-            id: '2',
-            title: 'Electricity Bill',
-            receiver: 'MSEB',
-            totalAmount: 4500,
-            settledAmount: 0,
-            status: 'Pending',
-            date: 'Jan 30, 2026',
-            priority: 'Medium'
-        },
-        {
-            id: '3',
-            title: 'Laptop Installment',
-            receiver: 'Amazon Pay',
-            totalAmount: 5000,
-            settledAmount: 5000,
-            status: 'Completed',
-            date: 'Jan 15, 2026',
-            priority: 'Routine'
-        },
-    ];
+    const [intents, setIntents] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchIntents();
+    }, []);
+
+    const fetchIntents = async () => {
+        try {
+            setLoading(true);
+            const res = await payments.getIntents();
+            setIntents(res.data);
+        } catch (err) {
+            console.error("Fetch intents error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -71,19 +60,23 @@ export default function IntentsScreen() {
 
             <ScrollView className="px-6" showsVerticalScrollIndicator={false}>
                 <VStack space="xl" className="pb-10">
-                    {intents.map((intent) => (
+                    {intents.length === 0 ? (
+                        <Box className="py-20 items-center">
+                            <Text className="text-slate-400 text-sm italic">No active payment intents</Text>
+                        </Box>
+                    ) : intents.map((intent: any) => (
                         <Pressable
                             key={intent.id}
                             onPress={() => router.push({
                                 pathname: "/intent/[id]",
                                 params: { id: intent.id }
                             })}
-                            className={`p-6 rounded-[32px] border ${intent.status === 'Completed' ? 'border-slate-100 bg-white dark:bg-slate-900/50 dark:border-slate-800' : 'border-amber-100 bg-amber-50/50 dark:border-amber-900/40 dark:bg-amber-950/20'} shadow-sm`}
+                            className={`p-6 rounded-[32px] border ${intent.status === 'Completed' ? 'border-slate-200 bg-white dark:bg-slate-900/50 dark:border-slate-800' : 'border-orange-100 bg-orange-50/50 dark:border-amber-900/40 dark:bg-amber-950/20'} shadow-sm`}
                         >
                             <HStack justifyContent="space-between" alignItems="flex-start" className="mb-4">
                                 <VStack space="xs" className="flex-1">
-                                    <Text className="font-bold text-lg dark:text-white">{intent.title}</Text>
-                                    <Text className="text-xs text-gray-500">To: {intent.receiver}</Text>
+                                    <Text className="font-bold text-lg dark:text-white uppercase tracking-tight">{intent.receiver}</Text>
+                                    <Text className="text-xs text-gray-500">Auto-Queue ID: {intent.id}</Text>
                                 </VStack>
                                 <Badge
                                     action={intent.status === 'Completed' ? 'success' : intent.status === 'Partial' ? 'warning' : 'info'}
@@ -96,23 +89,23 @@ export default function IntentsScreen() {
 
                             <VStack space="sm" className="mb-4">
                                 <HStack justifyContent="space-between" className="px-1">
-                                    <Text className="text-xs text-gray-500">Progress</Text>
+                                    <Text className="text-xs text-gray-500">Settlement Progress</Text>
                                     <Text className="text-xs font-bold dark:text-white">
-                                        ₹{intent.settledAmount} / ₹{intent.totalAmount}
+                                        ₹{parseFloat(intent.settled_amount).toLocaleString()} / ₹{parseFloat(intent.total_amount).toLocaleString()}
                                     </Text>
                                 </HStack>
-                                <Progress value={(intent.settledAmount / intent.totalAmount) * 100} className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full">
-                                    <ProgressFilledTrack className="bg-amber-500 rounded-full" />
+                                <Progress value={(parseFloat(intent.settled_amount) / parseFloat(intent.total_amount)) * 100} className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full">
+                                    <ProgressFilledTrack className="bg-orange-500 rounded-full" />
                                 </Progress>
                             </VStack>
 
                             <HStack justifyContent="space-between" alignItems="center">
                                 <HStack space="xs" alignItems="center">
                                     <Clock size={14} color="#64748b" />
-                                    <Text className="text-xs text-gray-400">{intent.date}</Text>
+                                    <Text className="text-xs text-gray-400">{new Date(intent.created_at).toLocaleDateString()}</Text>
                                 </HStack>
                                 <Button variant="link" size="sm" className="p-0">
-                                    <ButtonText className="text-brand-600 text-sm font-semibold">Details</ButtonText>
+                                    <ButtonText className="text-brand-600 text-sm font-semibold">View Timeline</ButtonText>
                                     <Icon as={ArrowRight} className="ml-1" size="sm" color="#0ea5e9" />
                                 </Button>
                             </HStack>

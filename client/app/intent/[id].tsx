@@ -27,28 +27,44 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useState, useEffect } from 'react';
+import { payments } from '../../services/api';
+
 export default function IntentDetailsScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
+    const [intent, setIntent] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Mock data for Intent
-    const intent = {
-        id: id || 'INT_9923',
-        title: 'Monthly Rent Payment',
-        receiver: 'Mahesh Shinde',
-        totalAmount: 12000,
-        settledAmount: 4000,
-        remainingAmount: 8000,
-        status: 'Partial',
-        createdDate: 'Jan 28, 2025',
-        lastTriggered: 'Feb 01, 2025 10:30 AM',
-        history: [
-            { id: 'h1', amount: 2500, date: 'Feb 01, 2025', time: '10:30 AM', status: 'Success' },
-            { id: 'h2', amount: 1500, date: 'Jan 30, 2025', time: '09:15 AM', status: 'Success' }
-        ]
+    useEffect(() => {
+        if (id) fetchIntent();
+    }, [id]);
+
+    const fetchIntent = async () => {
+        try {
+            setLoading(true);
+            const res = await payments.getIntentDetails(id as string);
+            setIntent(res.data);
+        } catch (err) {
+            console.error("Fetch intent error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const progress = (intent.settledAmount / intent.totalAmount) * 100;
+    if (loading) return (
+        <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <Text className="text-slate-500">Loading timeline...</Text>
+        </SafeAreaView>
+    );
+
+    if (!intent) return (
+        <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <Text className="text-red-500">Intent not found</Text>
+        </SafeAreaView>
+    );
+
+    const progress = (parseFloat(intent.settled_amount) / parseFloat(intent.total_amount)) * 100;
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -69,7 +85,7 @@ export default function IntentDetailsScreen() {
                                 <BadgeText className="text-[10px] text-white">AUTO-TRIGGER ACTIVE</BadgeText>
                             </Badge>
                         </HStack>
-                        <Text className="text-4xl font-black text-white">₹ {intent.totalAmount.toLocaleString()}</Text>
+                        <Text className="text-4xl font-black text-white">₹ {parseFloat(intent.total_amount).toLocaleString()}</Text>
 
                         <VStack space="xs" className="mt-4">
                             <HStack justifyContent="space-between">
@@ -83,12 +99,12 @@ export default function IntentDetailsScreen() {
 
                         <HStack className="mt-4 bg-white/10 p-4 rounded-2xl" justifyContent="space-around">
                             <VStack alignItems="center">
-                                <Text className="text-white font-bold">₹ {intent.settledAmount.toLocaleString()}</Text>
+                                <Text className="text-white font-bold">₹ {parseFloat(intent.settled_amount).toLocaleString()}</Text>
                                 <Text className="text-indigo-200 text-[10px]">PAID</Text>
                             </VStack>
                             <Divider orientation="vertical" className="bg-white/20 h-6" />
                             <VStack alignItems="center">
-                                <Text className="text-white font-bold">₹ {intent.remainingAmount.toLocaleString()}</Text>
+                                <Text className="text-white font-bold">₹ {parseFloat(intent.remaining_amount).toLocaleString()}</Text>
                                 <Text className="text-indigo-200 text-[10px]">PENDING</Text>
                             </VStack>
                         </HStack>
@@ -113,7 +129,7 @@ export default function IntentDetailsScreen() {
                         <Text className="text-lg font-bold dark:text-white">Settlement History</Text>
                     </HStack>
 
-                    {intent.history.map((item, index) => (
+                    {intent.history && intent.history.length > 0 ? intent.history.map((item: any, index: number) => (
                         <HStack key={item.id} space="md" className="relative pb-8">
                             {/* Visual Timeline line */}
                             {index < intent.history.length - 1 && (
@@ -126,13 +142,15 @@ export default function IntentDetailsScreen() {
 
                             <VStack className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
                                 <HStack justifyContent="space-between" alignItems="center">
-                                    <Text className="font-bold dark:text-white">₹ {item.amount.toLocaleString()}</Text>
-                                    <Text className="text-[10px] text-slate-500">{item.date}</Text>
+                                    <Text className="font-bold dark:text-white uppercase text-[10px] tracking-tight">₹ {parseFloat(item.amount).toLocaleString()}</Text>
+                                    <Text className="text-[10px] text-slate-500">{new Date(item.created_at).toLocaleDateString()}</Text>
                                 </HStack>
-                                <Text className="text-[10px] text-slate-400 mt-1">Settlement triggered at {item.time}</Text>
+                                <Text className="text-[10px] text-slate-400 mt-1">Settlement triggered at {new Date(item.created_at).toLocaleTimeString()}</Text>
                             </VStack>
                         </HStack>
-                    ))}
+                    )) : (
+                        <Text className="text-center text-slate-400 text-xs italic py-4">No settlements recorded yet.</Text>
+                    )}
 
                     <Box className="bg-gray-100 dark:bg-slate-800 p-4 rounded-2xl items-center border border-dashed border-gray-300 dark:border-slate-600">
                         <Text className="text-xs text-gray-400 font-semibold italic">Waiting for next wallet top-up...</Text>

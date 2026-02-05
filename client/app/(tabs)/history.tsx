@@ -23,17 +23,29 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useState, useEffect } from 'react';
+import { payments } from '../../services/api';
+
 export default function HistoryScreen() {
-    const transactions = [
-        { id: '1', title: 'Mahesh Shinde', type: 'sent', amount: 500, date: 'Feb 01, 2025', time: '10:30 AM', category: 'Transfer' },
-        { id: '2', title: 'Wallet Top-up', type: 'received', amount: 2000, date: 'Jan 28, 2025', time: '11:20 AM', category: 'Deposit' },
-        { id: '3', title: 'Zomato Merchant', type: 'sent', amount: 450, date: 'Jan 27, 2025', time: '08:45 PM', category: 'Food' },
-        { id: '4', title: 'Starbucks Coffee', type: 'sent', amount: 320, date: 'Jan 25, 2025', time: '09:15 AM', category: 'Beverage' },
-        { id: '5', title: 'Netflix Subscription', type: 'sent', amount: 199, date: 'Jan 22, 2025', time: '04:00 PM', category: 'Entertainment' },
-        { id: '6', title: 'Peter Parker', type: 'received', amount: 1500, date: 'Jan 20, 2025', time: '02:30 PM', category: 'Transfer' },
-        { id: '7', title: 'Uber Ride', type: 'sent', amount: 280, date: 'Jan 18, 2025', time: '06:20 PM', category: 'Transport' },
-    ];
     const router = useRouter();
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchHistory();
+    }, []);
+
+    const fetchHistory = async () => {
+        try {
+            setLoading(true);
+            const res = await payments.getHistory();
+            setTransactions(res.data);
+        } catch (err) {
+            console.error("Fetch history error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -60,23 +72,23 @@ export default function HistoryScreen() {
 
             <ScrollView className="px-6" showsVerticalScrollIndicator={false}>
                 <VStack space="lg" className="pb-10">
-                    <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest">February 2025</Text>
-                    {transactions.filter(t => t.date.includes('Feb')).map((tx) => (
+                    {transactions.length === 0 ? (
+                        <Box className="py-20 items-center">
+                            <Text className="text-slate-400 text-sm italic">No activity recorded</Text>
+                        </Box>
+                    ) : transactions.map((tx: any) => (
                         <Pressable key={tx.id} onPress={() => router.push({
                             pathname: "/transaction/[id]",
                             params: { id: tx.id }
                         })}>
-                            <TransactionItem {...tx} />
-                        </Pressable>
-                    ))}
-
-                    <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-4">January 2025</Text>
-                    {transactions.filter(t => t.date.includes('Jan')).map((tx) => (
-                        <Pressable key={tx.id} onPress={() => router.push({
-                            pathname: "/transaction/[id]",
-                            params: { id: tx.id }
-                        })}>
-                            <TransactionItem {...tx} />
+                            <TransactionItem
+                                title={tx.receiver}
+                                type={tx.type === 'credit' ? 'received' : 'sent'}
+                                amount={parseFloat(tx.amount)}
+                                date={new Date(tx.created_at).toLocaleDateString()}
+                                time={new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                category={tx.note || 'Transfer'}
+                            />
                         </Pressable>
                     ))}
                 </VStack>

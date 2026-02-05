@@ -25,24 +25,41 @@ import {
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { wallet, payments, auth } from '../../services/api';
 
 export default function DashboardScreen() {
   const router = useRouter();
+  const [balanceData, setBalanceData] = useState({ balance: 0, pendingSettlements: 0 });
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [activeIntents, setActiveIntents] = useState([]);
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for demonstration
-  const balance = "₹ 12,450.00";
-  const pendingSettlement = "₹ 2,500.00";
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const recentTransactions = [
-    { id: '1', name: 'John Doe', type: 'Sent', amount: '-₹ 500', date: 'Today, 10:30 AM', status: 'Completed' },
-    { id: '2', name: 'Zomato', type: 'Merchant', amount: '-₹ 450', date: 'Yesterday, 8:45 PM', status: 'Completed' },
-    { id: '3', name: 'Wallet Top-up', type: 'Credit', amount: '+₹ 2,000', date: '28 Jan, 11:20 AM', status: 'Completed' },
-  ];
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [balRes, historyRes, intentsRes, user] = await Promise.all([
+        wallet.getBalance(),
+        payments.getHistory(),
+        payments.getIntents(),
+        auth.getCurrentUser()
+      ]);
 
-  const activeIntents = [
-    { id: 'i1', receiver: 'Alice Smith', total: '₹ 5,000', settled: '₹ 2,500', remaining: '₹ 2,500', status: 'Partial' },
-    { id: 'i2', receiver: 'Rent Payment', total: '₹ 15,000', settled: '₹ 0', remaining: '₹ 15,000', status: 'Pending' },
-  ];
+      setBalanceData(balRes.data);
+      setRecentTransactions(historyRes.data.slice(0, 5)); // Only show top 5
+      setActiveIntents(intentsRes.data);
+      setUserData(user);
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -52,7 +69,7 @@ export default function DashboardScreen() {
           <HStack justifyContent="space-between" alignItems="center" className="mb-6">
             <VStack>
               <Text className="text-gray-500 dark:text-gray-400 font-medium">Welcome back,</Text>
-              <Text className="text-2xl font-bold dark:text-white">Mahesh Shinde</Text>
+              <Text className="text-2xl font-bold dark:text-white">{userData?.name || 'User'}</Text>
             </VStack>
             <HStack space="md" alignItems="center">
               <Pressable
@@ -63,9 +80,9 @@ export default function DashboardScreen() {
                 <Box className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
               </Pressable>
               <Avatar size="md">
-                <AvatarFallbackText>Mahesh Shinde</AvatarFallbackText>
+                <AvatarFallbackText>{userData?.name || 'User'}</AvatarFallbackText>
                 <AvatarImage
-                  source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }}
+                  source={{ uri: userData?.avatar || 'https://avatars.githubusercontent.com/u/120265441' }}
                 />
               </Avatar>
             </HStack>
@@ -86,11 +103,11 @@ export default function DashboardScreen() {
                   <Wallet color="white" size={16} />
                 </Box>
               </HStack>
-              <Text className="text-4xl font-extrabold text-white tracking-tight">{balance}</Text>
+              <Text className="text-4xl font-extrabold text-white tracking-tight">₹ {balanceData.balance.toLocaleString()}</Text>
               <HStack space="sm" className="bg-brand-500/40 self-start px-4 py-1.5 rounded-full items-center backdrop-blur-md">
                 <Clock color="#bae6fd" size={14} />
                 <Text className="text-brand-50 text-[11px] font-bold">
-                  Queued: {pendingSettlement}
+                  Queued: ₹ {balanceData.pendingSettlements.toLocaleString()}
                 </Text>
               </HStack>
             </VStack>
@@ -130,7 +147,11 @@ export default function DashboardScreen() {
               </Pressable>
             </HStack>
 
-            {activeIntents.map((intent) => (
+            {activeIntents.length === 0 ? (
+              <Box className="bg-slate-100 dark:bg-slate-800/40 rounded-2xl p-6 items-center">
+                <Text className="text-slate-400 text-sm">No active payment intents</Text>
+              </Box>
+            ) : activeIntents.map((intent: any) => (
               <Pressable
                 key={intent.id}
                 onPress={() => router.push({
@@ -143,8 +164,8 @@ export default function DashboardScreen() {
                 >
                   <HStack justifyContent="space-between" alignItems="center">
                     <VStack space="xs">
-                      <Text className="font-bold dark:text-white">{intent.receiver}</Text>
-                      <Text className="text-xs text-gray-500">Remaining: <Text className="font-bold text-orange-600">{intent.remaining}</Text> of {intent.total}</Text>
+                      <Text className="font-bold dark:text-white uppercase text-xs tracking-tight">{intent.receiver}</Text>
+                      <Text className="text-xs text-gray-500">Remaining: <Text className="font-bold text-orange-600">₹ {parseFloat(intent.remaining_amount).toLocaleString()}</Text> of ₹ {parseFloat(intent.total_amount).toLocaleString()}</Text>
                     </VStack>
                     <Box className="bg-orange-100 px-3 py-1 rounded-full">
                       <Text className="text-orange-700 text-[10px] font-bold uppercase">{intent.status}</Text>
@@ -153,7 +174,7 @@ export default function DashboardScreen() {
                   <Box className="mt-3 bg-gray-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                     <Box
                       className="bg-orange-500 h-full"
-                      style={{ width: `${(parseFloat(intent.settled.replace('₹ ', '').replace(',', '')) / parseFloat(intent.total.replace('₹ ', '').replace(',', ''))) * 100}%` }}
+                      style={{ width: `${(parseFloat(intent.settled_amount) / parseFloat(intent.total_amount)) * 100}%` }}
                     />
                   </Box>
                 </Box>
@@ -171,7 +192,11 @@ export default function DashboardScreen() {
             </HStack>
 
             <VStack space="sm">
-              {recentTransactions.map((tx, index) => (
+              {recentTransactions.length === 0 ? (
+                <Box className="py-8 items-center">
+                  <Text className="text-slate-400 text-sm italic">No recent transactions</Text>
+                </Box>
+              ) : recentTransactions.map((tx: any, index) => (
                 <Pressable
                   key={tx.id}
                   onPress={() => router.push({
@@ -181,17 +206,17 @@ export default function DashboardScreen() {
                 >
                   <HStack justifyContent="space-between" alignItems="center" className="py-2">
                     <HStack space="md" alignItems="center">
-                      <Box className={`p-2 rounded-xl ${tx.amount.startsWith('+') ? 'bg-green-100' : 'bg-gray-100 dark:bg-slate-800'}`}>
-                        {tx.amount.startsWith('+') ? <Plus color="#16a34a" size={18} /> : <ArrowUpRight color="#4b5563" size={18} />}
+                      <Box className={`p-2 rounded-xl ${tx.type === 'credit' ? 'bg-green-100' : 'bg-gray-100 dark:bg-slate-800'}`}>
+                        {tx.type === 'credit' ? <Plus color="#16a34a" size={18} /> : <ArrowUpRight color="#4b5563" size={18} />}
                       </Box>
                       <VStack>
-                        <Text className="font-semibold dark:text-white">{tx.name}</Text>
-                        <Text className="text-xs text-gray-400">{tx.date}</Text>
+                        <Text className="font-semibold dark:text-white uppercase text-xs">{tx.receiver}</Text>
+                        <Text className="text-[10px] text-gray-400">{new Date(tx.created_at).toLocaleDateString()}</Text>
                       </VStack>
                     </HStack>
                     <VStack alignItems="flex-end">
-                      <Text className={`font-bold ${tx.amount.startsWith('+') ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
-                        {tx.amount}
+                      <Text className={`font-bold ${tx.type === 'credit' ? 'text-green-600' : 'text-gray-900 dark:text-white'}`}>
+                        {tx.type === 'credit' ? '+' : '-'}₹ {parseFloat(tx.amount).toLocaleString()}
                       </Text>
                       <Text className="text-[10px] text-gray-400">{tx.status}</Text>
                     </VStack>

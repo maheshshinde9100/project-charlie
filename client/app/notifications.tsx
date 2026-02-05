@@ -20,52 +20,49 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState, useEffect } from 'react';
+import { notifications as notifApi } from '../services/api';
+
+const getNotifIcon = (type: string) => {
+    switch (type) {
+        case 'AUTO_SETTLE': return Zap;
+        case 'TOPUP': return CheckCircle2;
+        case 'INTENT_CREATED': return Clock;
+        case 'PAYMENT': return ArrowLeft;
+        default: return Bell;
+    }
+};
+
+const getNotifColor = (type: string) => {
+    switch (type) {
+        case 'AUTO_SETTLE': return '#0ea5e9';
+        case 'TOPUP': return '#16a34a';
+        case 'INTENT_CREATED': return '#ea580c';
+        case 'PAYMENT': return '#4b5563';
+        default: return '#6366f1';
+    }
+};
 
 export default function NotificationsScreen() {
     const router = useRouter();
+    const [notifs, setNotifs] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const notifications = [
-        {
-            id: '1',
-            type: 'AUTO_SETTLE',
-            title: 'Auto-Settlement Successful',
-            message: '₹1,500 was automatically transferred to Mahesh Shinde for "Monthly Rent".',
-            time: '2 mins ago',
-            icon: Zap,
-            iconColor: '#0ea5e9',
-            isNew: true
-        },
-        {
-            id: '2',
-            type: 'WALLET',
-            title: 'Wallet Top-up',
-            message: '₹5,000 has been credited to your wallet via UPI.',
-            time: '1 hour ago',
-            icon: CheckCircle2,
-            iconColor: '#16a34a',
-            isNew: true
-        },
-        {
-            id: '3',
-            type: 'INTENT',
-            title: 'New Payment Intent Created',
-            message: 'Insufficient balance for "Zomato". A pending intent has been created.',
-            time: 'Yesterday',
-            icon: Clock,
-            iconColor: '#ea580c',
-            isNew: false
-        },
-        {
-            id: '4',
-            type: 'SECURITY',
-            title: 'Security Alert',
-            message: 'A new login was detected from a Linux device in Pune, India.',
-            time: '2 days ago',
-            icon: AlertCircle,
-            iconColor: '#ef4444',
-            isNew: false
+    useEffect(() => {
+        fetchNotifs();
+    }, []);
+
+    const fetchNotifs = async () => {
+        try {
+            setLoading(true);
+            const res = await notifApi.getNotifications();
+            setNotifs(res.data);
+        } catch (err) {
+            console.error("Fetch notifications error:", err);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -79,21 +76,29 @@ export default function NotificationsScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <VStack className="py-2">
-                    {notifications.map((notif) => (
-                        <Pressable key={notif.id} className={`px-6 py-5 flex-row space-x-4 ${notif.isNew ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''}`}>
-                            <Box className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
-                                <notif.icon size={22} color={notif.iconColor} />
-                            </Box>
-                            <VStack className="flex-1" space="xs">
-                                <HStack justifyContent="space-between" alignItems="center">
-                                    <Text className={`font-bold text-sm dark:text-white ${notif.isNew ? 'text-brand-900' : 'text-slate-900'}`}>{notif.title}</Text>
-                                    {notif.isNew && <Box className="w-2 h-2 rounded-full bg-brand-600" />}
-                                </HStack>
-                                <Text className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{notif.message}</Text>
-                                <Text className="text-[10px] text-gray-400 font-medium mt-1">{notif.time}</Text>
-                            </VStack>
-                        </Pressable>
-                    ))}
+                    {notifs.length === 0 ? (
+                        <Box className="py-20 items-center">
+                            <Text className="text-slate-400 text-sm italic">No notifications yet</Text>
+                        </Box>
+                    ) : notifs.map((notif: any) => {
+                        const IconComp = getNotifIcon(notif.type);
+                        const color = getNotifColor(notif.type);
+                        return (
+                            <Pressable key={notif.id} className={`px-6 py-5 flex-row space-x-4 ${notif.is_new ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''}`}>
+                                <Box className="p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-800">
+                                    <IconComp size={22} color={color} />
+                                </Box>
+                                <VStack className="flex-1" space="xs">
+                                    <HStack justifyContent="space-between" alignItems="center">
+                                        <Text className={`font-bold text-sm dark:text-white ${notif.is_new ? 'text-brand-900' : 'text-slate-900'}`}>{notif.title}</Text>
+                                        {notif.is_new && <Box className="w-2 h-2 rounded-full bg-brand-600" />}
+                                    </HStack>
+                                    <Text className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed">{notif.message}</Text>
+                                    <Text className="text-[10px] text-gray-400 font-medium mt-1">{new Date(notif.created_at).toLocaleString()}</Text>
+                                </VStack>
+                            </Pressable>
+                        );
+                    })}
                 </VStack>
 
                 <Box className="px-6 py-10 items-center">

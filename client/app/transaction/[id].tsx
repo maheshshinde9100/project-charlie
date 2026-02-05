@@ -26,33 +26,53 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AvatarImage } from '@gluestack-ui/config/build/theme/AvatarImage';
 
+import { useState, useEffect } from 'react';
+import { payments } from '../../services/api';
+
 export default function TransactionDetailsScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams();
+    const [tx, setTx] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Mock data - In a real app, fetch using ID
-    const tx = {
-        id: id || 'TXN_9823471',
-        title: 'John Doe',
-        amount: '₹ 500.00',
-        status: 'Success',
-        date: 'February 01, 2025',
-        time: '10:30 AM',
-        paymentMethod: 'Wallet Balance',
-        transactionId: 'UTI7283947192837',
-        vpa: 'john.doe@okaxis',
-        category: 'Transfer'
+    useEffect(() => {
+        if (id) fetchTx();
+    }, [id]);
+
+    const fetchTx = async () => {
+        try {
+            setLoading(true);
+            const res = await payments.getTransactionDetails(id as string);
+            setTx(res.data);
+        } catch (err) {
+            console.error("Fetch transaction error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const onShare = async () => {
+        if (!tx) return;
         try {
             await Share.share({
-                message: `Payment of ${tx.amount} to ${tx.title} was successful. Transaction ID: ${tx.transactionId}`,
+                message: `Payment of ₹ ${tx.amount} to ${tx.receiver} was successful. Transaction ID: ${tx.transaction_ref || tx.id}`,
             });
         } catch (error) {
             console.log(error);
         }
     };
+
+    if (loading) return (
+        <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <Text className="text-slate-500">Loading receipt...</Text>
+        </SafeAreaView>
+    );
+
+    if (!tx) return (
+        <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <Text className="text-red-500">Transaction not found</Text>
+        </SafeAreaView>
+    );
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -75,30 +95,30 @@ export default function TransactionDetailsScreen() {
                         </Box>
                         <VStack alignItems="center" space="xs">
                             <Text className="text-green-600 font-bold uppercase tracking-wider text-xs">Payment Successful</Text>
-                            <Text className="text-4xl font-black dark:text-white">{tx.amount}</Text>
+                            <Text className="text-4xl font-black dark:text-white">₹ {parseFloat(tx.amount).toLocaleString()}</Text>
                         </VStack>
 
                         <Divider className="my-4 bg-gray-100 dark:bg-slate-700" />
 
                         <HStack space="md" alignItems="center" className="w-full">
                             <Avatar size="md" className="bg-brand-100">
-                                <AvatarFallbackText>{tx.title}</AvatarFallbackText>
+                                <AvatarFallbackText>{tx.receiver}</AvatarFallbackText>
                                 <AvatarImage source={{ uri: 'https://avatars.githubusercontent.com/u/120265441' }} />
                             </Avatar>
                             <VStack className="flex-1">
-                                <Text className="font-bold text-lg dark:text-white">{tx.title}</Text>
-                                <Text className="text-xs text-gray-500">{tx.vpa}</Text>
+                                <Text className="font-bold text-lg dark:text-white uppercase text-xs">{tx.receiver}</Text>
+                                <Text className="text-xs text-gray-500">{tx.note || 'Transfer'}</Text>
                             </VStack>
                         </HStack>
                     </VStack>
 
                     <VStack space="lg" className="mt-8">
-                        <DetailRow label="Date & Time" value={`${tx.date}, ${tx.time}`} />
-                        <DetailRow label="Payment Method" value={tx.paymentMethod} />
-                        <DetailRow label="Category" value={tx.category} />
+                        <DetailRow label="Date & Time" value={new Date(tx.created_at).toLocaleString()} />
+                        <DetailRow label="Type" value={tx.type.toUpperCase()} />
+                        <DetailRow label="Status" value={tx.status} />
                         <DetailRow
                             label="Transaction ID"
-                            value={tx.transactionId}
+                            value={tx.transaction_ref || tx.id}
                             isCopyable
                             onCopy={() => { }}
                         />

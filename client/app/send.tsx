@@ -29,26 +29,53 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
+import { Alert } from 'react-native';
+import { wallet, payments } from '../services/api';
 
 export default function SendMoneyScreen() {
     const router = useRouter();
     const [amount, setAmount] = useState('');
-    const [receiver, setReceiver] = useState('John Doe');
+    const [receiver, setReceiver] = useState('John Doe'); // Default for demo
+    const [balance, setBalance] = useState(0);
+    const [loading, setLoading] = useState(false);
     const toast = useToast();
 
-    const currentBalance = 12450;
-    const isInsufficient = parseFloat(amount) > currentBalance;
+    useEffect(() => {
+        fetchBalance();
+    }, []);
 
-    const handleSend = () => {
+    const fetchBalance = async () => {
+        try {
+            const res = await wallet.getBalance();
+            setBalance(res.data.balance);
+        } catch (err) {
+            console.error("Fetch balance error:", err);
+        }
+    };
+
+    const isInsufficient = parseFloat(amount) > balance;
+
+    const handleSend = async () => {
         if (!amount || isNaN(parseFloat(amount))) return;
 
-        // Simulate payment logic
-        if (isInsufficient) {
-            alert(`Insufficient funds. A payment intent for ₹${amount} will be created and settled automatically when you add funds.`);
-        } else {
-            alert(`Payment of ₹${amount} successful!`);
+        setLoading(true);
+        try {
+            const res = await payments.initiatePayment(receiver, amount, "Sent via app");
+            if (res.data.intent) {
+                Alert.alert(
+                    "Balance Low: Intent Created",
+                    `A payment intent for ₹${amount} has been queued. It will be settled automatically when you top up.`
+                );
+            } else {
+                Alert.alert("Success", `Payment of ₹${amount} sent to ${receiver}!`);
+            }
+            router.replace('/(tabs)');
+        } catch (err: any) {
+            Alert.alert("Error", err.response?.data?.message || "Payment failed");
+        } finally {
+            setLoading(false);
         }
-        router.back();
     };
 
     return (
@@ -100,7 +127,7 @@ export default function SendMoneyScreen() {
                             </Input>
                         </HStack>
                         <Text className={`text-sm mt-4 ${isInsufficient ? 'text-orange-600 font-bold' : 'text-gray-500'}`}>
-                            Available: ₹{currentBalance.toLocaleString()}
+                            Available: ₹{balance.toLocaleString()}
                         </Text>
                     </VStack>
 
@@ -125,9 +152,10 @@ export default function SendMoneyScreen() {
                             size="xl"
                             className={`rounded-2xl h-16 shadow-xl ${isInsufficient ? 'bg-amber-600 shadow-amber-200' : 'bg-brand-600 shadow-brand-200'}`}
                             onPress={handleSend}
+                            isDisabled={loading}
                         >
                             <ButtonText className="font-bold">
-                                {isInsufficient ? 'Establish Auto-Payment' : `Send ₹${amount || '0'}`}
+                                {loading ? 'Processing...' : (isInsufficient ? 'Establish Auto-Payment' : `Send ₹${amount || '0'}`)}
                             </ButtonText>
                         </Button>
                         <Text className="text-center text-xs text-gray-500">

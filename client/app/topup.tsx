@@ -23,12 +23,28 @@ import {
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react';
+import { wallet } from '../services/api';
+import { Alert } from 'react-native';
 
 export default function TopUpScreen() {
     const router = useRouter();
     const [amount, setAmount] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [pendingSettlements, setPendingSettlements] = useState(0);
 
-    const pendingSettlements = 4500;
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const res = await wallet.getBalance();
+            setPendingSettlements(res.data.pendingSettlements);
+        } catch (err) {
+            console.error("Fetch balance error:", err);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-950">
@@ -96,12 +112,22 @@ export default function TopUpScreen() {
                     <Button
                         size="xl"
                         className="rounded-2xl h-16 bg-brand-600 mt-6 shadow-xl shadow-brand-200"
-                        onPress={() => {
-                            alert(`Added ₹${amount} successfully. Auto-trigger service is processing your pending intents!`);
-                            router.back();
+                        onPress={async () => {
+                            if (!amount || isNaN(parseFloat(amount))) return;
+                            setLoading(true);
+                            try {
+                                await wallet.topUp(parseFloat(amount), 'upi');
+                                Alert.alert("Success", `Added ₹${amount} successfully. Auto-trigger service is processing your pending intents!`);
+                                router.replace('/(tabs)');
+                            } catch (err: any) {
+                                Alert.alert("Error", err.response?.data?.message || "Top up failed");
+                            } finally {
+                                setLoading(false);
+                            }
                         }}
+                        isDisabled={loading}
                     >
-                        <ButtonText className="font-bold">Add Funds & Settle</ButtonText>
+                        <ButtonText className="font-bold">{loading ? 'Processing...' : 'Add Funds & Settle'}</ButtonText>
                     </Button>
 
                     <HStack space="xs" justifyContent="center" alignItems="center" className="mt-4">
