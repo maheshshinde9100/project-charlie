@@ -35,6 +35,12 @@ exports.topUp = async (req, res) => {
         // 1. Add funds to wallet
         await pool.query('UPDATE users SET balance = balance + $1 WHERE id = $2', [amount, userId]);
 
+        // Create notification for top-up
+        await pool.query(
+            "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'TOPUP', 'Wallet Top-up Successful', $2)",
+            [userId, `₹${amount} was added to your wallet via ${paymentMethod}.`]
+        );
+
         // 2. Fetch active/pending intents (oldest first or by priority?)
         // Doc says: "Adding funds will automatically trigger these transfers"
         const intentsRes = await pool.query(
@@ -67,6 +73,12 @@ exports.topUp = async (req, res) => {
                     [userId, intent.receiver, payAmount, intent.id]
                 );
 
+                // Create notification for auto-settlement
+                await pool.query(
+                    "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'AUTO_SETTLE', 'Auto-Settlement Successful', $2)",
+                    [userId, `₹${payAmount} was automatically settled for your payment to ${intent.receiver}. status: COMPLETED`]
+                );
+
             } else if (currentBalance > 0) {
                 // Partial settlement
                 const payAmount = currentBalance;
@@ -85,6 +97,12 @@ exports.topUp = async (req, res) => {
                 await pool.query(
                     "INSERT INTO transactions (user_id, receiver, amount, type, status, intent_id, created_at) VALUES ($1, $2, $3, 'debit', 'Success', $4, NOW())",
                     [userId, intent.receiver, payAmount, intent.id]
+                );
+
+                // Create notification for partial auto-settlement
+                await pool.query(
+                    "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'AUTO_SETTLE', 'Partial Auto-Settlement', $2)",
+                    [userId, `₹${payAmount} was partially settled for your payment to ${intent.receiver}. status: PARTIAL`]
                 );
             }
         }

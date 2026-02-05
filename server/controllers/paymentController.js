@@ -21,6 +21,12 @@ exports.initiatePayment = async (req, res) => {
                 [userId, receiverId, payAmount]
             );
 
+            // Create notification for full payment
+            await pool.query(
+                "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'PAYMENT', 'Payment Successful', $2)",
+                [userId, `₹${payAmount} was sent to ${receiverId}.`]
+            );
+
             await pool.query('COMMIT');
             return res.json({ message: 'Payment successful', transaction: newTx.rows[0] });
 
@@ -58,6 +64,12 @@ exports.initiatePayment = async (req, res) => {
             const newIntent = await pool.query(
                 "INSERT INTO payment_intents (user_id, receiver, total_amount, settled_amount, remaining_amount, status, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *",
                 [userId, receiverId, payAmount, settled, remaining, status]
+            );
+
+            // Create notification for intent
+            await pool.query(
+                "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'INTENT_CREATED', 'Payment Intent Queued', $2)",
+                [userId, `You initiated a payment of ₹${payAmount} to ${receiverId}. Due to insufficient balance, it has been queued for auto-settlement.`]
             );
 
             await pool.query('COMMIT');

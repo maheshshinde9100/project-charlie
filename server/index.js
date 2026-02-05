@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/authRoutes');
 const walletRoutes = require('./routes/walletRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const pool = require('./config/db'); //db connection is okk
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(limiter);
 app.use('/auth', authRoutes);
 app.use('/wallet', walletRoutes);
 app.use('/payments', paymentRoutes);
+app.use('/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
     res.send('Auto-Triggered Payment Service API is running');
