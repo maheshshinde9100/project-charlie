@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView } from 'react-native';
 import {
   Box,
   VStack,
@@ -7,7 +7,6 @@ import {
   Text,
   Button,
   ButtonText,
-  Icon,
   Avatar,
   AvatarFallbackText,
   AvatarImage,
@@ -16,16 +15,15 @@ import {
 } from '@gluestack-ui/themed';
 import {
   ArrowUpRight,
+  ArrowDownLeft,
   Plus,
   Clock,
   Wallet,
   ChevronRight,
-  AlertCircle,
   Bell
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
 import { wallet, payments, auth } from '../../services/api';
 
 export default function DashboardScreen() {
@@ -33,6 +31,7 @@ export default function DashboardScreen() {
   const [balanceData, setBalanceData] = useState({ balance: 0, pendingSettlements: 0 });
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [activeIntents, setActiveIntents] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState<{ received: any[], sent: any[] }>({ received: [], sent: [] });
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,16 +42,18 @@ export default function DashboardScreen() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [balRes, historyRes, intentsRes, user] = await Promise.all([
+      const [balRes, historyRes, intentsRes, requestsRes, user] = await Promise.all([
         wallet.getBalance(),
         payments.getHistory(),
         payments.getIntents(),
+        payments.getRequests(),
         auth.getCurrentUser()
       ]);
 
       setBalanceData(balRes.data);
       setRecentTransactions(historyRes.data.slice(0, 5)); // Only show top 5
       setActiveIntents(intentsRes.data);
+      setPendingRequests(requestsRes.data);
       setUserData(user);
     } catch (err) {
       console.error("Dashboard fetch error:", err);
@@ -123,6 +124,13 @@ export default function DashboardScreen() {
               onPress={() => router.push('/send')}
             />
             <ActionBtn
+              icon={ArrowDownLeft}
+              label="Request"
+              color="#ea580c"
+              bgColor="bg-orange-50 dark:bg-orange-900/10"
+              onPress={() => router.push('/request')}
+            />
+            <ActionBtn
               icon={Plus}
               label="Top Up"
               color="#10b981"
@@ -137,6 +145,31 @@ export default function DashboardScreen() {
               onPress={() => router.push('/history')}
             />
           </HStack>
+
+          {/* Pending Requests Section */}
+          {(pendingRequests.received.length > 0) && (
+            <VStack space="md" className="mb-8">
+              <Text className="text-lg font-bold dark:text-white">Pending Requests</Text>
+              {pendingRequests.received.map((req: any) => (
+                <Box key={req.id} className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+                  <HStack justifyContent="space-between" alignItems="center">
+                    <HStack space="md" alignItems="center">
+                      <Avatar size="sm" className="bg-indigo-100">
+                        <AvatarFallbackText>{req.requester_name}</AvatarFallbackText>
+                      </Avatar>
+                      <VStack>
+                        <Text className="font-bold dark:text-white">{req.requester_name}</Text>
+                        <Text className="text-xs text-gray-500">Requested ₹{parseFloat(req.amount).toLocaleString()}</Text>
+                      </VStack>
+                    </HStack>
+                    <Button size="xs" className="bg-brand-600 rounded-full" onPress={() => router.push({ pathname: '/send', params: { amount: req.amount, receiver: req.requester_name } })}>
+                      <ButtonText>Pay</ButtonText>
+                    </Button>
+                  </HStack>
+                </Box>
+              ))}
+            </VStack>
+          )}
 
           {/* Pending Auto-Settle Section */}
           <VStack space="md" className="mb-8">

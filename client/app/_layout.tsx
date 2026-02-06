@@ -24,6 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="register" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="send" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="request" options={{ presentation: 'modal' }} />
           <Stack.Screen name="topup" options={{ presentation: 'modal' }} />
           <Stack.Screen name="notifications" options={{ presentation: 'card' }} />
           <Stack.Screen name="transaction/[id]" options={{ presentation: 'card' }} />

@@ -27,7 +27,7 @@ import {
     History,
     AlertTriangle
 } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
@@ -41,9 +41,13 @@ export default function SendMoneyScreen() {
     const [loading, setLoading] = useState(false);
     const toast = useToast();
 
+    const params = useLocalSearchParams();
+
     useEffect(() => {
+        if (params.amount) setAmount(params.amount.toString());
+        if (params.receiver) setReceiver(params.receiver.toString());
         fetchBalance();
-    }, []);
+    }, [params]);
 
     const fetchBalance = async () => {
         try {

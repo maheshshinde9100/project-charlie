@@ -48,6 +48,9 @@ export const payments = {
     getTransactionDetails: (id: string) => api.get(`/payments/transaction/${id}`),
     initiatePayment: (receiverId: string, amount: string | number, note: string) =>
         api.post('/payments/initiate', { receiverId, amount: parseFloat(amount.toString()), note }),
+    requestMoney: (senderId: string, amount: string | number, note: string) =>
+        api.post('/payments/request', { senderId, amount: parseFloat(amount.toString()), note }),
+    getRequests: () => api.get('/payments/requests'),
 };
 
 export const notifications = {
