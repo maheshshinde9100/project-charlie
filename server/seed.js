@@ -12,6 +12,7 @@ const pool = new Pool({
 
 const createTables = async () => {
     try {
+        await pool.query('DROP TABLE IF EXISTS payment_requests CASCADE');
         await pool.query('DROP TABLE IF EXISTS notifications CASCADE');
         await pool.query('DROP TABLE IF EXISTS transactions CASCADE');
         await pool.query('DROP TABLE IF EXISTS payment_intents CASCADE');
@@ -66,10 +67,22 @@ const createTables = async () => {
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`;
 
+        const requestsTable = `
+        CREATE TABLE payment_requests (
+            id SERIAL PRIMARY KEY,
+            requester_id INTEGER REFERENCES users(id),
+            sender_id INTEGER REFERENCES users(id),
+            amount DECIMAL(15, 2) NOT NULL,
+            note VARCHAR(255),
+            status VARCHAR(20) DEFAULT 'PENDING',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );`;
+
         await pool.query(usersTable);
         await pool.query(intentsTable);
         await pool.query(transactionsTable);
         await pool.query(notificationsTable);
+        await pool.query(requestsTable);
         console.log("Tables created successfully.");
     } catch (err) {
         console.error("Error in createTables:", err);

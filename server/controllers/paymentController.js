@@ -141,3 +141,69 @@ exports.getTransactionDetails = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+exports.requestMoney = async (req, res) => {
+    const { senderId, amount, note } = req.body;
+    const requesterId = req.user.id; // Me
+    const reqAmount = parseFloat(amount);
+
+    try {
+        // Validate sender exists
+        const senderCheck = await pool.query('SELECT id, name FROM users WHERE id = $1', [senderId]);
+        if (senderCheck.rows.length === 0) {
+            return res.status(404).json({ message: 'Sender (payer) not found' });
+        }
+        const senderName = senderCheck.rows[0].name;
+
+        await pool.query('BEGIN');
+
+        // Create Request
+        const newReq = await pool.query(
+            "INSERT INTO payment_requests (requester_id, sender_id, amount, note, status, created_at) VALUES ($1, $2, $3, $4, 'PENDING', NOW()) RETURNING *",
+            [requesterId, senderId, reqAmount, note]
+        );
+
+        // Notify Sender (The person who owes money)
+        await pool.query(
+            "INSERT INTO notifications (user_id, type, title, message) VALUES ($1, 'REQUEST_RECEIVED', 'Payment Requested', $2)",
+            [senderId, `User ID ${requesterId} has requested ₹${reqAmount} from you.${note ? ' Note: ' + note : ''}`]
+        );
+
+        await pool.query('COMMIT');
+        res.json({ message: 'Request sent successfully', request: newReq.rows[0] });
+
+    } catch (err) {
+        await pool.query('ROLLBACK');
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+exports.getRequests = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Requests I received (I need to pay)
+        const received = await pool.query(`
+            SELECT pr.*, u.name as requester_name, u.email as requester_email 
+            FROM payment_requests pr 
+            JOIN users u ON pr.requester_id = u.id 
+            WHERE pr.sender_id = $1 AND pr.status = 'PENDING'
+            ORDER BY pr.created_at DESC
+        `, [userId]);
+
+        // Requests I sent (I am waiting for money)
+        const sent = await pool.query(`
+            SELECT pr.*, u.name as sender_name 
+            FROM payment_requests pr 
+            JOIN users u ON pr.sender_id = u.id 
+            WHERE pr.requester_id = $1 
+            ORDER BY pr.created_at DESC
+        `, [userId]);
+
+        res.json({ received: received.rows, sent: sent.rows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
