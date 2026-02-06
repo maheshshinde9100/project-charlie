@@ -128,7 +128,7 @@ export default function DashboardScreen() {
               label="Request"
               color="#ea580c"
               bgColor="bg-orange-50 dark:bg-orange-900/10"
-              onPress={() => router.push('/request')}
+              onPress={() => router.push('/request' as any)}
             />
             <ActionBtn
               icon={Plus}
